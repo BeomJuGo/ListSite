@@ -1,170 +1,126 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>김고난 아이템 목록</title>
-  <style>
-    * { box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>김고난 아이템 목록</title>
 
-    body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-      background: #f8fafc;
-      color: #1e293b;
-    }
+<style>
+* { box-sizing: border-box; }
 
-    h1 {
-      font-size: 1.75rem;
-      margin-bottom: 1.5rem;
-      color: #0f172a;
-    }
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #f8fafc;
+  color: #1e293b;
+}
 
-    .search-box {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
-    }
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
 
-    .search-box:focus {
-      outline: none;
-      border-color: #3b82f6;
-    }
+.search-box {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
 
-    .category-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
 
-    .category-buttons button {
-      padding: 0.5rem 1rem;
-      border: 1px solid #e2e8f0;
-      background: white;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
+.category-buttons button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    .category-buttons button.active {
-      background: #3b82f6;
-      color: white;
-      border-color: #3b82f6;
-    }
+.category-buttons button.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
 
-    .item-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-    .item-list li {
-      padding: 1rem 1.25rem;
-      background: white;
-      border-radius: 8px;
-      margin-bottom: 0.75rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      transition: 0.2s;
-    }
+.item-list li {
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  transition: 0.2s;
+}
 
-    .item-list li:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
+.item-list li:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
 
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
 
-    .item-name {
-      font-weight: 600;
-      font-size: 1rem;
-    }
+.item-name {
+  font-weight: 600;
+}
 
-    .item-info {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
+.item-info {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
 
-    .badge {
-      padding: 0.3rem 0.7rem;
-      font-size: 0.75rem;
-      border-radius: 999px;
-      font-weight: 500;
-    }
+.badge {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  font-weight: 500;
+}
 
-    .grade-S { background: #facc15; color: #78350f; }
-    .grade-A { background: #fef3c7; color: #92400e; }
-    .grade-B { background: #dbeafe; color: #1e40af; }
-    .grade-C { background: #e2e8f0; color: #334155; }
+.grade-S { background: #facc15; color: #78350f; }
+.grade-A { background: #fef3c7; color: #92400e; }
+.grade-B { background: #dbeafe; color: #1e40af; }
+.grade-C { background: #e2e8f0; color: #334155; }
 
-    .price {
-      background: #dcfce7;
-      color: #166534;
-    }
+.price {
+  background: #dcfce7;
+  color: #166534;
+}
 
-    .qty {
-      background: #e2e8f0;
-      color: #334155;
-    }
+.qty {
+  background: #e2e8f0;
+  color: #334155;
+}
 
-    .soldout {
-      opacity: 0.5;
-    }
-
-    .no-results {
-      text-align: center;
-      padding: 3rem;
-      color: #64748b;
-      background: white;
-      border-radius: 8px;
-    }
-
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-
-    .pagination button {
-      padding: 0.5rem 1rem;
-      border: 1px solid #e2e8f0;
-      background: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .pagination button.active {
-      background: #3b82f6;
-      color: white;
-    }
-
-    footer {
-      margin-top: 3rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e2e8f0;
-      text-align: center;
-    }
-
-    footer a {
-      color: #3b82f6;
-      text-decoration: none;
-      font-weight: 500;
-    }
-  </style>
+.no-results {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  background: white;
+  border-radius: 8px;
+}
+</style>
 </head>
+
 <body>
 
 <h1>김고난 아이템 목록</h1>
@@ -173,58 +129,92 @@
 <div class="category-buttons" id="categoryButtons"></div>
 
 <ul class="item-list" id="itemList"></ul>
-<div class="no-results" id="noResults" style="display: none;">
-  검색 결과가 없습니다.
+<div class="no-results" id="noResults" style="display:none;">
+검색 결과가 없습니다.
 </div>
-<div class="pagination" id="pagination"></div>
-
-<footer>
-  <a href="#">김고난에게 문의하기!</a>
-</footer>
 
 <script>
 
-const ITEMS = [
-  { name: "삼성전자 갤럭시 S25", category: "전자기기", grade: "S", price: 1200000, quantity: 3 },
-  { name: "애플 아이폰 15", category: "전자기기", grade: "A", price: 1300000, quantity: 1 },
-  { name: "LG 그램 노트북", category: "전자기기", grade: "B", price: 1500000, quantity: 0 },
-  { name: "다이슨 에어랩", category: "가전", grade: "A", price: 600000, quantity: 5 },
-  { name: "닌텐도 스위치", category: "게임", grade: "A", price: 400000, quantity: 2 },
-  { name: "플레이스테이션 5", category: "게임", grade: "S", price: 700000, quantity: 0 },
-];
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytKwgl8ya7_Vg6-vObEJUjeFii4yuvsqNn0BBWNBt7YORXEN7mv2FSc4KAoGscL-RVwA/exec"; // 🔥 여기에 Apps Script URL 붙여넣기
 
-const CATEGORIES = ["전체", ...new Set(ITEMS.map(i => i.category))];
-const PER_PAGE = 5;
+let ITEMS = [];
 
 const state = {
-  filteredItems: ITEMS,
-  page: 1,
+  filteredItems: [],
   category: "전체",
-  searchQuery: "",
+  searchQuery: ""
 };
 
 function removeSpaces(str) {
   return str.replace(/\s/g, "");
 }
 
-function filterItems(query, category) {
+async function loadItems() {
+  try {
+    const response = await fetch(WEB_APP_URL);
+    const data = await response.json();
+
+    ITEMS = data.map(item => ({
+      name: item.name,
+      category: item.category,
+      grade: item.grade,
+      price: Number(item.price),
+      quantity: Number(item.quantity)
+    }));
+
+    // 🔥 재고 0 제외
+    state.filteredItems = ITEMS.filter(i => i.quantity > 0);
+
+    renderCategoryButtons();
+    renderList(state.filteredItems);
+
+  } catch (err) {
+    alert("데이터를 불러오지 못했습니다.");
+    console.error(err);
+  }
+}
+
+function filterItems() {
   let result = ITEMS;
 
-  if (category !== "전체") {
-    result = result.filter(i => i.category === category);
+  // 🔥 재고 0 자동 숨김
+  result = result.filter(i => i.quantity > 0);
+
+  if (state.category !== "전체") {
+    result = result.filter(i => i.category === state.category);
   }
 
-  if (query) {
-    const q = removeSpaces(query.toLowerCase());
+  if (state.searchQuery) {
+    const q = removeSpaces(state.searchQuery.toLowerCase());
     result = result.filter(i =>
       removeSpaces(i.name.toLowerCase()).includes(q)
     );
   }
 
-  return result;
+  state.filteredItems = result;
+  renderList(result);
 }
 
-function renderList(items, page) {
+function renderCategoryButtons() {
+  const container = document.getElementById("categoryButtons");
+  const categories = ["전체", ...new Set(ITEMS
+    .filter(i => i.quantity > 0)
+    .map(i => i.category))];
+
+  container.innerHTML = categories.map(cat =>
+    `<button class="${cat === state.category ? "active" : ""}" data-cat="${cat}">${cat}</button>`
+  ).join("");
+
+  container.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.category = btn.dataset.cat;
+      renderCategoryButtons();
+      filterItems();
+    });
+  });
+}
+
+function renderList(items) {
   const listEl = document.getElementById("itemList");
   const noResultsEl = document.getElementById("noResults");
 
@@ -236,54 +226,28 @@ function renderList(items, page) {
 
   noResultsEl.style.display = "none";
 
-  const start = (page - 1) * PER_PAGE;
-  const pageItems = items.slice(start, start + PER_PAGE);
-
-  listEl.innerHTML = pageItems.map(item => `
-    <li class="${item.quantity === 0 ? "soldout" : ""}">
+  listEl.innerHTML = items.map(item => `
+    <li>
       <div class="item-row">
         <div class="item-name">${item.name}</div>
         <div class="item-info">
           <span class="badge grade-${item.grade}">${item.grade}등급</span>
           <span class="badge price">${item.price.toLocaleString()}원</span>
-          <span class="badge qty">
-            ${item.quantity === 0 ? "품절" : "재고 " + item.quantity + "개"}
-          </span>
+          <span class="badge qty">재고 ${item.quantity}개</span>
         </div>
       </div>
     </li>
   `).join("");
 }
 
-function renderCategoryButtons() {
-  const container = document.getElementById("categoryButtons");
-
-  container.innerHTML = CATEGORIES.map(cat =>
-    `<button class="${cat === state.category ? "active" : ""}" data-cat="${cat}">${cat}</button>`
-  ).join("");
-
-  container.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      state.category = btn.dataset.cat;
-      applyFilters();
-      renderCategoryButtons();
-    });
-  });
-}
-
-function applyFilters() {
-  state.filteredItems = filterItems(state.searchQuery, state.category);
-  renderList(state.filteredItems, 1);
-}
-
 document.getElementById("searchInput").addEventListener("input", e => {
   state.searchQuery = e.target.value;
-  applyFilters();
+  filterItems();
 });
 
-renderCategoryButtons();
-renderList(ITEMS, 1);
+loadItems();
 
 </script>
+
 </body>
 </html>
