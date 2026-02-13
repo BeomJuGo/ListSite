@@ -25,25 +25,27 @@ h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
   font-size: 1rem;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.category-buttons {
+.filter-group {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  align-items: center;
 }
 
-.category-buttons button {
-  padding: 0.5rem 1rem;
+.filter-group button {
+  padding: 0.4rem 0.8rem;
   border: 1px solid #e2e8f0;
   background: white;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 0.9rem;
 }
 
-.category-buttons button.active {
+.filter-group button.active {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;
@@ -97,7 +99,11 @@ h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
 <h1>김고난 아이템 목록</h1>
 
 <input type="text" class="search-box" id="searchInput" placeholder="검색어를 입력하세요 (띄어쓰기 무시)">
-<div class="category-buttons" id="categoryButtons"></div>
+
+<!-- 필터 버튼 그룹 -->
+<div class="filter-group" id="genderFilters"></div>
+<div class="filter-group" id="categoryFilters"></div>
+<div class="filter-group" id="gradeFilters"></div>
 
 <ul class="item-list" id="itemList"></ul>
 <div class="no-results" id="noResults" style="display:none;">
@@ -105,13 +111,21 @@ h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
 </div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytKwgl8ya7_Vg6-vObEJUjeFii4yuvsqNn0BBWNBt7YORXEN7mv2FSc4KAoGscL-RVwA/exec"; // 🔥 여기에 Apps Script URL 붙여넣기
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytKwgl8ya7_Vg6-vObEJUjeFii4yuvsqNn0BBWNBt7YORXEN7mv2FSc4KAoGscL-RVwA/exec"; // 🔥 Apps Script URL
 
 let ITEMS = [];
 
-const state = { filteredItems: [], category: "전체", searchQuery: "" };
+const state = {
+  category: "전체",
+  grade: "전체",
+  gender: "전체",
+  searchQuery: ""
+};
 
-function removeSpaces(str) { return str.replace(/\s/g, ""); }
+// 공용 포함 모든 성별
+const GENDERS = ["전체","남성","여성","공용"];
+
+function removeSpaces(str) { return str.replace(/\s/g,""); }
 
 async function loadItems() {
   try {
@@ -124,62 +138,104 @@ async function loadItems() {
       grade: item.grade,
       price: Number(item.price),
       quantity: Number(item.quantity),
-      gender: item.gender
-    }));
+      gender: item.gender && item.gender.trim()!=="" ? item.gender : "공용"
+    })).filter(i=>i.quantity>0);
 
-    state.filteredItems = ITEMS.filter(i => i.quantity > 0);
+    renderFilters();
+    filterAndRender();
 
-    renderCategoryButtons();
-    renderList(state.filteredItems);
-
-  } catch (err) {
-    console.error("에러 발생:", err);
+  } catch(e) {
+    console.error(e);
     alert("데이터를 불러오지 못했습니다.");
   }
 }
 
-function filterItems() {
-  let result = ITEMS.filter(i => i.quantity > 0);
+// 필터 버튼 렌더링
+function renderFilters() {
+  const genderContainer = document.getElementById("genderFilters");
+  genderContainer.innerHTML = GENDERS.map(g => `<button data-gender="${g}" class="${state.gender===g?'active':''}">${g}</button>`).join("");
 
-  if (state.category !== "전체") result = result.filter(i => i.category === state.category);
-  if (state.searchQuery) {
-    const q = removeSpaces(state.searchQuery.toLowerCase());
-    result = result.filter(i => removeSpaces(i.name.toLowerCase()).includes(q));
-  }
+  const categories = ["전체", ...new Set(ITEMS.map(i=>i.category))];
+  const categoryContainer = document.getElementById("categoryFilters");
+  categoryContainer.innerHTML = categories.map(c => `<button data-category="${c}" class="${state.category===c?'active':''}">${c}</button>`).join("");
 
-  state.filteredItems = result;
-  renderList(result);
-}
+  const grades = ["전체", ...new Set(ITEMS.map(i=>i.grade))];
+  const gradeContainer = document.getElementById("gradeFilters");
+  gradeContainer.innerHTML = grades.map(g => `<button data-grade="${g}" class="${state.grade===g?'active':''}">${g}</button>`).join("");
 
-function renderCategoryButtons() {
-  const container = document.getElementById("categoryButtons");
-  const categories = ["전체", ...new Set(ITEMS.filter(i=>i.quantity>0).map(i=>i.category))];
+  // 이벤트 연결
+  genderContainer.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", ()=>{
+      state.gender = btn.dataset.gender;
+      renderFilters();
+      filterAndRender();
+    });
+  });
 
-  container.innerHTML = categories.map(cat =>
-    `<button class="${cat===state.category?"active":""}" data-cat="${cat}">${cat}</button>`
-  ).join("");
+  categoryContainer.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", ()=>{
+      state.category = btn.dataset.category;
+      renderFilters();
+      filterAndRender();
+    });
+  });
 
-  container.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      state.category = btn.dataset.cat;
-      renderCategoryButtons();
-      filterItems();
+  gradeContainer.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", ()=>{
+      state.grade = btn.dataset.grade;
+      renderFilters();
+      filterAndRender();
     });
   });
 }
 
-function renderList(items) {
+// 필터 적용 후 렌더링
+function filterAndRender() {
+  let result = ITEMS.slice();
+
+  if(state.gender !== "전체") result = result.filter(i => i.gender===state.gender);
+  if(state.category !== "전체") result = result.filter(i => i.category===state.category);
+  if(state.grade !== "전체") result = result.filter(i => i.grade===state.grade);
+
+  if(state.searchQuery){
+    const q = removeSpaces(state.searchQuery.toLowerCase());
+    result = result.filter(i=>removeSpaces(i.name.toLowerCase()).includes(q));
+  }
+
+  renderList(result);
+}
+
+// 검색 이벤트
+document.getElementById("searchInput").addEventListener("input", e=>{
+  state.searchQuery = e.target.value;
+  filterAndRender();
+});
+
+// 아이템 렌더링
+function renderList(items){
   const listEl = document.getElementById("itemList");
   const noResultsEl = document.getElementById("noResults");
 
   if(items.length===0){ listEl.innerHTML=""; noResultsEl.style.display="block"; return; }
-
   noResultsEl.style.display="none";
 
-  // 🔥 gender를 grade 왼쪽으로 이동
-  listEl.innerHTML = items.map(item => `
+  listEl.innerHTML = items.map(item=>`
     <li>
       <div class="item-row">
         <div class="item-name">${item.name}</div>
         <div class="item-info">
-          <span clas
+          <span class="badge gender">${item.gender}</span>
+          <span class="badge grade-${item.grade}">${item.grade}</span>
+          <span class="badge price">${item.price.toLocaleString()}원</span>
+          <span class="badge qty">재고 ${item.quantity}개</span>
+        </div>
+      </div>
+    </li>
+  `).join("");
+}
+
+loadItems();
+</script>
+
+</body>
+</html>
