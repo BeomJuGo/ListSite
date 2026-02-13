@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>김고난 아이템 목록</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
+
     body {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
       max-width: 800px;
@@ -16,11 +15,13 @@
       background: #f8fafc;
       color: #1e293b;
     }
+
     h1 {
       font-size: 1.75rem;
       margin-bottom: 1.5rem;
       color: #0f172a;
     }
+
     .search-box {
       width: 100%;
       padding: 0.75rem 1rem;
@@ -28,18 +29,20 @@
       border: 2px solid #e2e8f0;
       border-radius: 8px;
       margin-bottom: 1.5rem;
-      transition: border-color 0.2s;
     }
+
     .search-box:focus {
       outline: none;
       border-color: #3b82f6;
     }
+
     .category-buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
       margin-bottom: 1.5rem;
     }
+
     .category-buttons button {
       padding: 0.5rem 1rem;
       border: 1px solid #e2e8f0;
@@ -48,57 +51,77 @@
       cursor: pointer;
       font-size: 0.9rem;
     }
-    .category-buttons button:hover {
-      background: #f1f5f9;
-    }
+
     .category-buttons button.active {
       background: #3b82f6;
       color: white;
       border-color: #3b82f6;
     }
+
     .item-list {
       list-style: none;
       padding: 0;
       margin: 0;
     }
+
     .item-list li {
       padding: 1rem 1.25rem;
       background: white;
       border-radius: 8px;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      transition: box-shadow 0.2s;
+      transition: 0.2s;
     }
+
     .item-list li:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
-    .pagination {
+
+    .item-row {
       display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin: 2rem 0;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
       flex-wrap: wrap;
     }
-    .pagination button {
-      padding: 0.5rem 1rem;
-      border: 1px solid #e2e8f0;
-      background: white;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
+
+    .item-name {
+      font-weight: 600;
+      font-size: 1rem;
     }
-    .pagination button:hover:not(:disabled) {
-      background: #f1f5f9;
+
+    .item-info {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
-    .pagination button.active {
-      background: #3b82f6;
-      color: white;
-      border-color: #3b82f6;
+
+    .badge {
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      font-weight: 500;
     }
-    .pagination button:disabled {
+
+    .grade-S { background: #facc15; color: #78350f; }
+    .grade-A { background: #fef3c7; color: #92400e; }
+    .grade-B { background: #dbeafe; color: #1e40af; }
+    .grade-C { background: #e2e8f0; color: #334155; }
+
+    .price {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .qty {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .soldout {
       opacity: 0.5;
-      cursor: not-allowed;
     }
+
     .no-results {
       text-align: center;
       padding: 3rem;
@@ -106,189 +129,161 @@
       background: white;
       border-radius: 8px;
     }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .pagination button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #e2e8f0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .pagination button.active {
+      background: #3b82f6;
+      color: white;
+    }
+
     footer {
       margin-top: 3rem;
       padding-top: 1.5rem;
       border-top: 1px solid #e2e8f0;
       text-align: center;
     }
+
     footer a {
       color: #3b82f6;
       text-decoration: none;
       font-weight: 500;
     }
-    footer a:hover {
-      text-decoration: underline;
-    }
   </style>
 </head>
 <body>
-  <h1>김고난 아이템 목록</h1>
-  <input type="text" class="search-box" id="searchInput" placeholder="검색어를 입력하세요 (띄어쓰기 무시)">
-  <div class="category-buttons" id="categoryButtons"></div>
 
-  <ul class="item-list" id="itemList"></ul>
-  <div class="no-results" id="noResults" style="display: none;">
-    검색 결과가 없습니다.
-  </div>
-  <div class="pagination" id="pagination"></div>
+<h1>김고난 아이템 목록</h1>
 
-  <footer>
-    <a href="https://vercel.com" target="_blank" rel="noopener">Vercel로 이동</a>
-  </footer>
+<input type="text" class="search-box" id="searchInput" placeholder="검색어를 입력하세요 (띄어쓰기 무시)">
+<div class="category-buttons" id="categoryButtons"></div>
 
-  <script>
-    // ========== 아이템 목록 (여기에 직접 추가/수정하세요) ==========
-    // 각 아이템은 { name: "이름", category: "카테고리" } 형태
-    const ITEMS = [
-      { name: "삼성전자 갤럭시 S25", category: "의상" },
-      { name: "애플 아이폰 15", category: "가구" },
-      { name: "LG 그램 노트북", category: "가구" },
-      { name: "다이슨 에어랩", category: "가구" },
-      { name: "아이패드 프로", category: "가구" },
-      { name: "맥북 에어 M3", category: "가구" },
-      { name: "소니 WH-1000XM5", category: "가구" },
-      { name: "닌텐도 스위치", category: "가구" },
-      { name: "플레이스테이션 5", category: "가구" },
-      { name: "엑스박스 시리즈 X", category: "가구" },
-      { name: "삼성 OLED TV", category: "가구" },
-      { name: "LG 냉장고", category: "가구" },
-      { name: "다이슨 청소기", category: "가구" },
-      { name: "필립스 휴", category: "의상" },
-      { name: "구글 픽셀 워치", category: "의상" },
-      { name: "갤럭시 워치 6", category: "의상" },
-      { name: "에어팟 프로", category: "의상" },
-      { name: "샤오미 밴드", category: "의상" },
-      { name: "킨들 페이퍼화이트", category: "말풍선" },
-      { name: "로지텍 MX 마스터", category: "프로필" }
-    ];
+<ul class="item-list" id="itemList"></ul>
+<div class="no-results" id="noResults" style="display: none;">
+  검색 결과가 없습니다.
+</div>
+<div class="pagination" id="pagination"></div>
 
-    // ========== 카테고리 목록 (전체 + 아이템에서 자동 추출, 필요시 수동 추가) ==========
-    const CATEGORIES = ["전체", ...new Set(ITEMS.map((i) => i.category).filter(Boolean))];
+<footer>
+  <a href="#">김고난에게 문의하기!</a>
+</footer>
 
-    // ========== 하단 링크 URL (원하는 주소로 변경하세요) ==========
-    const FOOTER_LINK_URL = "https://open.kakao.com/o/szMFlV7g";
-    const FOOTER_LINK_TEXT = "김고난에게 문의하기!";
+<script>
 
-    const PER_PAGE = 10;
+const ITEMS = [
+  { name: "삼성전자 갤럭시 S25", category: "전자기기", grade: "S", price: 1200000, quantity: 3 },
+  { name: "애플 아이폰 15", category: "전자기기", grade: "A", price: 1300000, quantity: 1 },
+  { name: "LG 그램 노트북", category: "전자기기", grade: "B", price: 1500000, quantity: 0 },
+  { name: "다이슨 에어랩", category: "가전", grade: "A", price: 600000, quantity: 5 },
+  { name: "닌텐도 스위치", category: "게임", grade: "A", price: 400000, quantity: 2 },
+  { name: "플레이스테이션 5", category: "게임", grade: "S", price: 700000, quantity: 0 },
+];
 
-    function removeSpaces(str) {
-      return str.replace(/\s/g, "");
-    }
+const CATEGORIES = ["전체", ...new Set(ITEMS.map(i => i.category))];
+const PER_PAGE = 5;
 
-    function filterItems(query, category) {
-      let result = ITEMS;
-      if (category && category !== "전체") {
-        result = result.filter(item => item.category === category);
-      }
-      if (query) {
-        const normalizedQuery = removeSpaces(query.toLowerCase());
-        result = result.filter(item =>
-          removeSpaces(item.name.toLowerCase()).includes(normalizedQuery)
-        );
-      }
-      return result;
-    }
+const state = {
+  filteredItems: ITEMS,
+  page: 1,
+  category: "전체",
+  searchQuery: "",
+};
 
-    function renderList(filteredItems, page) {
-      const listEl = document.getElementById("itemList");
-      const noResultsEl = document.getElementById("noResults");
-      const paginationEl = document.getElementById("pagination");
+function removeSpaces(str) {
+  return str.replace(/\s/g, "");
+}
 
-      const start = (page - 1) * PER_PAGE;
-      const pageItems = filteredItems.slice(start, start + PER_PAGE);
-      const totalPages = Math.max(1, Math.ceil(filteredItems.length / PER_PAGE));
+function filterItems(query, category) {
+  let result = ITEMS;
 
-      if (filteredItems.length === 0) {
-        listEl.innerHTML = "";
-        noResultsEl.style.display = "block";
-        paginationEl.innerHTML = "";
-        return;
-      }
+  if (category !== "전체") {
+    result = result.filter(i => i.category === category);
+  }
 
-      noResultsEl.style.display = "none";
-      listEl.innerHTML = pageItems
-        .map((item) => `<li>${escapeHtml(item.name)}</li>`)
-        .join("");
+  if (query) {
+    const q = removeSpaces(query.toLowerCase());
+    result = result.filter(i =>
+      removeSpaces(i.name.toLowerCase()).includes(q)
+    );
+  }
 
-      renderPagination(paginationEl, page, totalPages, filteredItems.length);
-    }
+  return result;
+}
 
-    function escapeHtml(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
-    }
+function renderList(items, page) {
+  const listEl = document.getElementById("itemList");
+  const noResultsEl = document.getElementById("noResults");
 
-    function renderPagination(container, currentPage, totalPages, totalItems) {
-      let html = "";
+  if (items.length === 0) {
+    listEl.innerHTML = "";
+    noResultsEl.style.display = "block";
+    return;
+  }
 
-      if (currentPage > 1) {
-        html += `<button data-page="1">처음</button>`;
-        html += `<button data-page="${currentPage - 1}">이전</button>`;
-      }
+  noResultsEl.style.display = "none";
 
-      const startPage = Math.max(1, currentPage - 2);
-      const endPage = Math.min(totalPages, currentPage + 2);
+  const start = (page - 1) * PER_PAGE;
+  const pageItems = items.slice(start, start + PER_PAGE);
 
-      for (let i = startPage; i <= endPage; i++) {
-        html += `<button class="${i === currentPage ? "active" : ""}" data-page="${i}">${i}</button>`;
-      }
+  listEl.innerHTML = pageItems.map(item => `
+    <li class="${item.quantity === 0 ? "soldout" : ""}">
+      <div class="item-row">
+        <div class="item-name">${item.name}</div>
+        <div class="item-info">
+          <span class="badge grade-${item.grade}">${item.grade}등급</span>
+          <span class="badge price">${item.price.toLocaleString()}원</span>
+          <span class="badge qty">
+            ${item.quantity === 0 ? "품절" : "재고 " + item.quantity + "개"}
+          </span>
+        </div>
+      </div>
+    </li>
+  `).join("");
+}
 
-      if (currentPage < totalPages) {
-        html += `<button data-page="${currentPage + 1}">다음</button>`;
-        html += `<button data-page="${totalPages}">마지막</button>`;
-      }
+function renderCategoryButtons() {
+  const container = document.getElementById("categoryButtons");
 
-      container.innerHTML = html;
+  container.innerHTML = CATEGORIES.map(cat =>
+    `<button class="${cat === state.category ? "active" : ""}" data-cat="${cat}">${cat}</button>`
+  ).join("");
 
-      container.querySelectorAll("button").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const page = parseInt(btn.dataset.page, 10);
-          state.page = page;
-          renderList(state.filteredItems, page);
-        });
-      });
-    }
-
-    const state = {
-      filteredItems: ITEMS,
-      page: 1,
-      category: "전체",
-      searchQuery: "",
-    };
-
-    function applyFilters() {
-      state.filteredItems = filterItems(state.searchQuery, state.category);
-      state.page = 1;
-      renderList(state.filteredItems, 1);
-    }
-
-    function renderCategoryButtons() {
-      const container = document.getElementById("categoryButtons");
-      container.innerHTML = CATEGORIES.map(
-        (cat) =>
-          `<button class="${cat === state.category ? "active" : ""}" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
-      ).join("");
-      container.querySelectorAll("button").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          state.category = btn.dataset.category;
-          applyFilters();
-          renderCategoryButtons();
-        });
-      });
-    }
-
-    document.getElementById("searchInput").addEventListener("input", (e) => {
-      state.searchQuery = e.target.value;
+  container.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.category = btn.dataset.cat;
       applyFilters();
+      renderCategoryButtons();
     });
+  });
+}
 
-    document.querySelector("footer a").href = FOOTER_LINK_URL;
-    document.querySelector("footer a").textContent = FOOTER_LINK_TEXT;
+function applyFilters() {
+  state.filteredItems = filterItems(state.searchQuery, state.category);
+  renderList(state.filteredItems, 1);
+}
 
-    renderCategoryButtons();
-    renderList(state.filteredItems, 1);
-  </script>
+document.getElementById("searchInput").addEventListener("input", e => {
+  state.searchQuery = e.target.value;
+  applyFilters();
+});
+
+renderCategoryButtons();
+renderList(ITEMS, 1);
+
+</script>
 </body>
 </html>
