@@ -17,7 +17,23 @@ body {
   color: #1e293b;
 }
 
-h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+h1 { font-size: 1.8rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+
+.header-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #3b82f6;
+  text-decoration: none;
+  background: #e0f2fe;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.header-link:hover {
+  text-decoration: underline;
+  background: #bae6fd;
+}
 
 .search-box {
   width: 100%;
@@ -102,7 +118,11 @@ h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
 
 <body>
 
-<h1>김고난 아이템 목록</h1>
+<!-- 헤더 + 문의 링크 -->
+<h1>
+  김고난 아이템 목록
+  <a href="https://open.kakao.com/o/szMFlV7g" target="_blank" rel="noopener" class="header-link">김고난에게 문의하기!</a>
+</h1>
 
 <input type="text" class="search-box" id="searchInput" placeholder="검색어를 입력하세요 (띄어쓰기 무시)">
 
