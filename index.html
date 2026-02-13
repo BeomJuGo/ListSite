@@ -17,10 +17,7 @@ body {
   color: #1e293b;
 }
 
-h1 {
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-}
+h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
 
 .search-box {
   width: 100%;
@@ -52,11 +49,7 @@ h1 {
   border-color: #3b82f6;
 }
 
-.item-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+.item-list { list-style: none; padding: 0; margin: 0; }
 
 .item-list li {
   padding: 1rem 1.25rem;
@@ -67,57 +60,35 @@ h1 {
   transition: 0.2s;
 }
 
-.item-list li:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
+.item-list li:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-.item-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
+.item-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
 
-.item-name {
-  font-weight: 600;
-}
+.item-name { font-weight: 600; }
 
-.item-info {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
+.item-info { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 .badge {
   padding: 0.3rem 0.7rem;
   font-size: 0.75rem;
   border-radius: 999px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.grade-S { background: #facc15; color: #78350f; }
-.grade-A { background: #fef3c7; color: #92400e; }
-.grade-B { background: #dbeafe; color: #1e40af; }
-.grade-C { background: #e2e8f0; color: #334155; }
+/* 등급 색상 */
+.grade-골드 { background: #facc15; color: #78350f; }
+.grade-퍼플 { background: #a855f7; color: white; }
+.grade-블루 { background: #3b82f6; color: white; }
+.grade-레드 { background: #ef4444; color: white; }
+.grade-그린 { background: #22c55e; color: white; }
 
-.price {
-  background: #dcfce7;
-  color: #166534;
-}
+/* 가격, 수량, 성별 */
+.price { background: #dcfce7; color: #166534; }
+.qty { background: #e2e8f0; color: #334155; }
+.gender { background: #f0fdfa; color: #0f766e; }
 
-.qty {
-  background: #e2e8f0;
-  color: #334155;
-}
+.no-results { text-align: center; padding: 3rem; color: #64748b; background: white; border-radius: 8px; }
 
-.no-results {
-  text-align: center;
-  padding: 3rem;
-  color: #64748b;
-  background: white;
-  border-radius: 8px;
-}
 </style>
 </head>
 
@@ -134,24 +105,17 @@ h1 {
 </div>
 
 <script>
-
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytKwgl8ya7_Vg6-vObEJUjeFii4yuvsqNn0BBWNBt7YORXEN7mv2FSc4KAoGscL-RVwA/exec"; // 🔥 여기에 Apps Script URL 붙여넣기
 
 let ITEMS = [];
 
-const state = {
-  filteredItems: [],
-  category: "전체",
-  searchQuery: ""
-};
+const state = { filteredItems: [], category: "전체", searchQuery: "" };
 
-function removeSpaces(str) {
-  return str.replace(/\s/g, "");
-}
+function removeSpaces(str) { return str.replace(/\s/g, ""); }
 
 async function loadItems() {
   try {
-    const response = await fetch(WEB_APP_URL);
+    const response = await fetch(WEB_APP_URL + "?t=" + Date.now());
     const data = await response.json();
 
     ITEMS = data.map(item => ({
@@ -159,36 +123,28 @@ async function loadItems() {
       category: item.category,
       grade: item.grade,
       price: Number(item.price),
-      quantity: Number(item.quantity)
+      quantity: Number(item.quantity),
+      gender: item.gender
     }));
 
-    // 🔥 재고 0 제외
     state.filteredItems = ITEMS.filter(i => i.quantity > 0);
 
     renderCategoryButtons();
     renderList(state.filteredItems);
 
   } catch (err) {
+    console.error("에러 발생:", err);
     alert("데이터를 불러오지 못했습니다.");
-    console.error(err);
   }
 }
 
 function filterItems() {
-  let result = ITEMS;
+  let result = ITEMS.filter(i => i.quantity > 0);
 
-  // 🔥 재고 0 자동 숨김
-  result = result.filter(i => i.quantity > 0);
-
-  if (state.category !== "전체") {
-    result = result.filter(i => i.category === state.category);
-  }
-
+  if (state.category !== "전체") result = result.filter(i => i.category === state.category);
   if (state.searchQuery) {
     const q = removeSpaces(state.searchQuery.toLowerCase());
-    result = result.filter(i =>
-      removeSpaces(i.name.toLowerCase()).includes(q)
-    );
+    result = result.filter(i => removeSpaces(i.name.toLowerCase()).includes(q));
   }
 
   state.filteredItems = result;
@@ -197,12 +153,10 @@ function filterItems() {
 
 function renderCategoryButtons() {
   const container = document.getElementById("categoryButtons");
-  const categories = ["전체", ...new Set(ITEMS
-    .filter(i => i.quantity > 0)
-    .map(i => i.category))];
+  const categories = ["전체", ...new Set(ITEMS.filter(i=>i.quantity>0).map(i=>i.category))];
 
   container.innerHTML = categories.map(cat =>
-    `<button class="${cat === state.category ? "active" : ""}" data-cat="${cat}">${cat}</button>`
+    `<button class="${cat===state.category?"active":""}" data-cat="${cat}">${cat}</button>`
   ).join("");
 
   container.querySelectorAll("button").forEach(btn => {
@@ -218,36 +172,14 @@ function renderList(items) {
   const listEl = document.getElementById("itemList");
   const noResultsEl = document.getElementById("noResults");
 
-  if (items.length === 0) {
-    listEl.innerHTML = "";
-    noResultsEl.style.display = "block";
-    return;
-  }
+  if(items.length===0){ listEl.innerHTML=""; noResultsEl.style.display="block"; return; }
 
-  noResultsEl.style.display = "none";
+  noResultsEl.style.display="none";
 
+  // 🔥 gender를 grade 왼쪽으로 이동
   listEl.innerHTML = items.map(item => `
     <li>
       <div class="item-row">
         <div class="item-name">${item.name}</div>
         <div class="item-info">
-          <span class="badge grade-${item.grade}">${item.grade}등급</span>
-          <span class="badge price">${item.price.toLocaleString()}원</span>
-          <span class="badge qty">재고 ${item.quantity}개</span>
-        </div>
-      </div>
-    </li>
-  `).join("");
-}
-
-document.getElementById("searchInput").addEventListener("input", e => {
-  state.searchQuery = e.target.value;
-  filterItems();
-});
-
-loadItems();
-
-</script>
-
-</body>
-</html>
+          <span clas
