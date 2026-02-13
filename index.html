@@ -36,6 +36,12 @@ h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
   align-items: center;
 }
 
+.filter-group .label {
+  font-weight: 600;
+  margin-right: 0.5rem;
+  white-space: nowrap;
+}
+
 .filter-group button {
   padding: 0.4rem 0.8rem;
   border: 1px solid #e2e8f0;
@@ -100,10 +106,16 @@ h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
 
 <input type="text" class="search-box" id="searchInput" placeholder="검색어를 입력하세요 (띄어쓰기 무시)">
 
-<!-- 필터 버튼 그룹 -->
-<div class="filter-group" id="genderFilters"></div>
-<div class="filter-group" id="categoryFilters"></div>
-<div class="filter-group" id="gradeFilters"></div>
+<!-- 필터 버튼 그룹 순서: 카테고리 → 성별 → 등급 -->
+<div class="filter-group" id="categoryFilters">
+  <span class="label">[카테고리]</span>
+</div>
+<div class="filter-group" id="genderFilters">
+  <span class="label">[성별]</span>
+</div>
+<div class="filter-group" id="gradeFilters">
+  <span class="label">[등급]</span>
+</div>
 
 <ul class="item-list" id="itemList"></ul>
 <div class="no-results" id="noResults" style="display:none;">
@@ -111,7 +123,7 @@ h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
 </div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytKwgl8ya7_Vg6-vObEJUjeFii4yuvsqNn0BBWNBt7YORXEN7mv2FSc4KAoGscL-RVwA/exec"; // 🔥 Apps Script URL
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytKwgl8ya7_Vg6-vObEJUjeFii4yuvsqNn0BBWNBt7YORXEN7mv2FSc4KAoGscL-RVwA/exec";
 
 let ITEMS = [];
 
@@ -122,7 +134,6 @@ const state = {
   searchQuery: ""
 };
 
-// 공용 포함 모든 성별
 const GENDERS = ["전체","남성","여성","공용"];
 
 function removeSpaces(str) { return str.replace(/\s/g,""); }
@@ -152,29 +163,35 @@ async function loadItems() {
 
 // 필터 버튼 렌더링
 function renderFilters() {
-  const genderContainer = document.getElementById("genderFilters");
-  genderContainer.innerHTML = GENDERS.map(g => `<button data-gender="${g}" class="${state.gender===g?'active':''}">${g}</button>`).join("");
-
+  // 카테고리
   const categories = ["전체", ...new Set(ITEMS.map(i=>i.category))];
   const categoryContainer = document.getElementById("categoryFilters");
-  categoryContainer.innerHTML = categories.map(c => `<button data-category="${c}" class="${state.category===c?'active':''}">${c}</button>`).join("");
+  categoryContainer.innerHTML = `<span class="label">[카테고리]</span>` + categories.map(c => 
+    `<button data-category="${c}" class="${state.category===c?'active':''}">${c}</button>`).join("");
 
+  // 성별
+  const genderContainer = document.getElementById("genderFilters");
+  genderContainer.innerHTML = `<span class="label">[성별]</span>` + GENDERS.map(g => 
+    `<button data-gender="${g}" class="${state.gender===g?'active':''}">${g}</button>`).join("");
+
+  // 등급
   const grades = ["전체", ...new Set(ITEMS.map(i=>i.grade))];
   const gradeContainer = document.getElementById("gradeFilters");
-  gradeContainer.innerHTML = grades.map(g => `<button data-grade="${g}" class="${state.grade===g?'active':''}">${g}</button>`).join("");
+  gradeContainer.innerHTML = `<span class="label">[등급]</span>` + grades.map(g => 
+    `<button data-grade="${g}" class="${state.grade===g?'active':''}">${g}</button>`).join("");
 
   // 이벤트 연결
-  genderContainer.querySelectorAll("button").forEach(btn => {
+  categoryContainer.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", ()=>{
-      state.gender = btn.dataset.gender;
+      state.category = btn.dataset.category;
       renderFilters();
       filterAndRender();
     });
   });
 
-  categoryContainer.querySelectorAll("button").forEach(btn => {
+  genderContainer.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", ()=>{
-      state.category = btn.dataset.category;
+      state.gender = btn.dataset.gender;
       renderFilters();
       filterAndRender();
     });
